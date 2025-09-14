@@ -2,10 +2,12 @@ package com.finance.finance.controller;
 
 import com.finance.finance.dto.CashFlowRequest;
 import com.finance.finance.dto.CashFlowResponse;
-import com.finance.finance.entity.CashFlow;
 import com.finance.finance.entity.User;
 import com.finance.finance.service.CashFlowService;
-import com.finance.finance.service.CategoryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,15 +19,18 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/auth/test")
+@Tag(name = "Test", description = "Endpoints para testes e desenvolvimento")
 public class TestController {
 
     @Autowired
     private CashFlowService cashFlowService;
 
-    @Autowired
-    private CategoryService categoryService;
-
     @PostMapping("/create-user")
+    @Operation(summary = "Criar usuário de teste", description = "Endpoint para criar um usuário de teste para desenvolvimento")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Usuário de teste criado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Erro na criação do usuário")
+    })
     public ResponseEntity<Map<String, String>> createTestUser() {
         // This would normally create a user, but for testing we'll just return success
         Map<String, String> response = new HashMap<>();
@@ -34,6 +39,11 @@ public class TestController {
     }
 
     @PostMapping("/cashflow")
+    @Operation(summary = "Criar fluxo de caixa de teste", description = "Endpoint para criar um fluxo de caixa de teste")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fluxo de caixa criado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Erro na criação do fluxo de caixa")
+    })
     public ResponseEntity<CashFlowResponse> createTestCashFlow(@RequestBody CashFlowRequest request) {
         try {
             // Create a mock user for testing
@@ -51,6 +61,11 @@ public class TestController {
     }
 
     @GetMapping("/dashboard")
+    @Operation(summary = "Obter dashboard de teste", description = "Endpoint para obter dados do dashboard de teste")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Dados do dashboard obtidos com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Erro ao obter dados do dashboard")
+    })
     public ResponseEntity<Map<String, Object>> getTestDashboard() {
         try {
             // Create a mock user for testing

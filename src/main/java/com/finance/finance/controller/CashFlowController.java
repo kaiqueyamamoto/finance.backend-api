@@ -7,6 +7,12 @@ import com.finance.finance.entity.User;
 import com.finance.finance.service.CashFlowService;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,6 +33,8 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth/cashflow")
+@Tag(name = "Cash Flow", description = "Endpoints para gerenciamento de fluxo de caixa")
+@SecurityRequirement(name = "bearerAuth")
 public class CashFlowController {
 
     @Autowired
@@ -53,6 +61,12 @@ public class CashFlowController {
     }
 
     @PostMapping
+    @Operation(summary = "Criar fluxo de caixa", description = "Cria uma nova entrada de fluxo de caixa (receita ou despesa)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Fluxo de caixa criado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "401", description = "Não autorizado")
+    })
     public ResponseEntity<CashFlowResponse> createCashFlow(
             @Valid @RequestBody CashFlowRequest request,
             Authentication authentication) {
@@ -67,7 +81,14 @@ public class CashFlowController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Obter fluxo de caixa por ID", description = "Retorna um fluxo de caixa específico pelo ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fluxo de caixa encontrado"),
+            @ApiResponse(responseCode = "404", description = "Fluxo de caixa não encontrado"),
+            @ApiResponse(responseCode = "401", description = "Não autorizado")
+    })
     public ResponseEntity<CashFlowResponse> getCashFlow(
+            @Parameter(description = "ID do fluxo de caixa")
             @PathVariable Long id,
             Authentication authentication) {
         User user = (User) authentication.getPrincipal();
@@ -77,6 +98,11 @@ public class CashFlowController {
     }
 
     @GetMapping
+    @Operation(summary = "Listar fluxos de caixa", description = "Retorna uma lista paginada de fluxos de caixa do usuário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de fluxos de caixa obtida com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Não autorizado")
+    })
     public ResponseEntity<Page<CashFlowResponse>> getCashFlows(
             @PageableDefault(size = 20) Pageable pageable,
             Authentication authentication) {

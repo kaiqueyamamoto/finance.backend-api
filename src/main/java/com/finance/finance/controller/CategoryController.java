@@ -5,6 +5,12 @@ import com.finance.finance.entity.Category;
 import com.finance.finance.service.CategoryService;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +22,8 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth/categories")
+@Tag(name = "Categories", description = "Endpoints para gerenciamento de categorias")
+@SecurityRequirement(name = "bearerAuth")
 public class CategoryController {
 
     @Autowired
@@ -42,6 +50,11 @@ public class CategoryController {
     }
 
     @PostMapping
+    @Operation(summary = "Criar categoria", description = "Cria uma nova categoria de receita ou despesa")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Categoria criada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    })
     public ResponseEntity<CategoryResponse> createCategory(
             @RequestBody Map<String, String> request) {
         try {
@@ -58,13 +71,22 @@ public class CategoryController {
     }
 
     @GetMapping
+    @Operation(summary = "Listar todas as categorias", description = "Retorna todas as categorias disponíveis")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de categorias obtida com sucesso")
+    })
     public ResponseEntity<List<CategoryResponse>> getAllCategories() {
         List<CategoryResponse> categories = categoryService.getAllCategories();
         return ResponseEntity.ok(categories);
     }
 
     @GetMapping("/type/{type}")
+    @Operation(summary = "Listar categorias por tipo", description = "Retorna categorias filtradas por tipo (INCOME ou EXPENSE)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Categorias obtidas com sucesso")
+    })
     public ResponseEntity<List<CategoryResponse>> getCategoriesByType(
+            @Parameter(description = "Tipo da categoria (INCOME ou EXPENSE)")
             @PathVariable Category.CategoryType type) {
         List<CategoryResponse> categories = categoryService.getCategoriesByType(type);
         return ResponseEntity.ok(categories);

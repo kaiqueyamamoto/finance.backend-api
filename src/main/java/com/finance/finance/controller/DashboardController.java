@@ -6,6 +6,12 @@ import com.finance.finance.service.CashFlowService;
 import com.finance.finance.service.CategoryService;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +26,8 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/auth/dashboard")
+@Tag(name = "Dashboard", description = "Endpoints para visualização de dados financeiros")
+@SecurityRequirement(name = "bearerAuth")
 public class DashboardController {
 
     @Autowired
@@ -41,8 +49,15 @@ public class DashboardController {
     }
 
     @GetMapping("/overview")
+    @Operation(summary = "Obter visão geral financeira", description = "Retorna um resumo financeiro do período especificado")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Visão geral obtida com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Não autorizado")
+    })
     public ResponseEntity<Map<String, Object>> getOverview(
+            @Parameter(description = "Data de início do período (formato: YYYY-MM-DD)")
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @Parameter(description = "Data de fim do período (formato: YYYY-MM-DD)")
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             Authentication authentication) {
         
@@ -91,7 +106,13 @@ public class DashboardController {
     }
 
     @GetMapping("/monthly-summary")
+    @Operation(summary = "Obter resumo mensal", description = "Retorna um resumo financeiro anual")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Resumo mensal obtido com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Não autorizado")
+    })
     public ResponseEntity<Map<String, Object>> getMonthlySummary(
+            @Parameter(description = "Ano para o resumo (padrão: ano atual)")
             @RequestParam(required = false) Integer year,
             Authentication authentication) {
         
@@ -119,6 +140,11 @@ public class DashboardController {
     }
 
     @GetMapping("/quick-stats")
+    @Operation(summary = "Obter estatísticas rápidas", description = "Retorna estatísticas financeiras dos últimos 7 dias e mês atual")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Estatísticas obtidas com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Não autorizado")
+    })
     public ResponseEntity<Map<String, Object>> getQuickStats(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         
