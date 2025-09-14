@@ -1,5 +1,12 @@
 # Guia de Documentação da API Finance
 
+## 🔐 Credenciais de Acesso
+
+**Usuário:** `kaiqueyamamoto`  
+**Senha:** `B4aHwdyVX5RXal08eHzzGzydfAFHUAMhW7s61bktGU8=`
+
+> ⚠️ **Importante:** Esta senha é para desenvolvimento. Em produção, use senhas mais seguras.
+
 ## Como Usar a Documentação Swagger
 
 ### 1. Iniciando a Aplicação
@@ -36,11 +43,24 @@ Após iniciar a aplicação, acesse:
 
 ### 4. Autenticação
 
+#### Credenciais de Usuário
+**Username:** `kaiqueyamamoto`  
+**Password:** `B4aHwdyVX5RXal08eHzzGzydfAFHUAMhW7s61bktGU8=`
+
 #### Configuração Bearer Token
 1. Na interface Swagger, clique no botão "Authorize"
 2. Insira o token JWT no formato: `Bearer {seu-token}`
 3. Clique em "Authorize"
 4. Agora você pode testar endpoints protegidos
+
+#### Login via API
+```bash
+POST /auth/login
+{
+  "username": "kaiqueyamamoto",
+  "password": "B4aHwdyVX5RXal08eHzzGzydfAFHUAMhW7s61bktGU8="
+}
+```
 
 #### Exemplo de Token
 ```
