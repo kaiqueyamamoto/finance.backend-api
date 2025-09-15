@@ -17,7 +17,7 @@ import java.util.function.Function;
 @Component
 public class JwtConfig {
 
-    @Value("${jwt.secret:FinanceAppSecretKey2024!@#$%^&*()}")
+    @Value("${jwt.secret:FinanceAppSecretKey2024!@#$%^&*()FinanceAppSecretKey2024!@#$%^&*()FinanceAppSecretKey2024!@#$%^&*()FinanceAppSecretKey2024!@#$%^&*()}")
     private String secret;
 
     @Value("${jwt.expiration:3600000}") // 1 hora em milissegundos
@@ -84,7 +84,9 @@ public class JwtConfig {
     }
 
     private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes());
+        // Use Keys.secretKeyFor to generate a secure key for HS512
+        // This ensures the key is exactly 512 bits (64 bytes) as required by HS512
+        return Keys.secretKeyFor(SignatureAlgorithm.HS512);
     }
 
     public Long getExpiration() {
