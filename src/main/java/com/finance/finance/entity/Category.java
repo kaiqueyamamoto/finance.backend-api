@@ -48,7 +48,8 @@ public class Category {
     private List<CashFlow> cashFlows = new ArrayList<>();
 
     // Constructors
-    public Category() {}
+    public Category() {
+    }
 
     public Category(String name, String description, CategoryType type) {
         this.name = name;

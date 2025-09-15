@@ -72,7 +72,8 @@ public class CashFlow {
     private LocalDateTime updatedAt;
 
     // Constructors
-    public CashFlow() {}
+    public CashFlow() {
+    }
 
     public CashFlow(String description, BigDecimal amount, LocalDate transactionDate, 
                    CashFlowType type, Category category, User user) {

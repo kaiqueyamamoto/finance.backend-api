@@ -93,8 +93,9 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable Long id) {
-        Optional<CategoryResponse> category = categoryService.getCategoryById(id);
+    public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable String id) {
+        Long categoryId = Long.parseLong(id);
+        Optional<CategoryResponse> category = categoryService.getCategoryById(categoryId);
         return category.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -108,14 +109,15 @@ public class CategoryController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CategoryResponse> updateCategory(
-            @PathVariable Long id,
+            @PathVariable String id,
             @RequestBody Map<String, String> request) {
         try {
             String name = request.get("name");
             String description = request.get("description");
             Category.CategoryType type = Category.CategoryType.valueOf(request.get("type"));
             
-            CategoryResponse response = categoryService.updateCategory(id, name, description, type);
+            Long categoryId = Long.parseLong(id);
+            CategoryResponse response = categoryService.updateCategory(categoryId, name, description, type);
             categoryUpdatedCounter.increment();
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -124,9 +126,10 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteCategory(@PathVariable String id) {
         try {
-            categoryService.deleteCategory(id);
+            Long categoryId = Long.parseLong(id);
+            categoryService.deleteCategory(categoryId);
             categoryDeletedCounter.increment();
             return ResponseEntity.noContent().build();
         } catch (Exception e) {

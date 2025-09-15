@@ -4,6 +4,7 @@ import com.finance.finance.dto.CashFlowRequest;
 import com.finance.finance.dto.CashFlowResponse;
 import com.finance.finance.entity.CashFlow;
 import com.finance.finance.entity.User;
+import com.finance.finance.repository.UserRepository;
 import com.finance.finance.service.CashFlowService;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -41,6 +42,9 @@ public class CashFlowController {
     private CashFlowService cashFlowService;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private MeterRegistry meterRegistry;
 
     private final Counter cashFlowCreatedCounter;
@@ -71,7 +75,9 @@ public class CashFlowController {
             @Valid @RequestBody CashFlowRequest request,
             Authentication authentication) {
         try {
-            User user = (User) authentication.getPrincipal();
+            String username = authentication.getName();
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
             CashFlowResponse response = cashFlowService.createCashFlow(request, user);
             cashFlowCreatedCounter.increment();
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -89,10 +95,11 @@ public class CashFlowController {
     })
     public ResponseEntity<CashFlowResponse> getCashFlow(
             @Parameter(description = "ID do fluxo de caixa")
-            @PathVariable Long id,
+            @PathVariable String id,
             Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        Optional<CashFlowResponse> response = cashFlowService.getCashFlowById(id, user);
+        Long cashFlowId = Long.parseLong(id);
+        Optional<CashFlowResponse> response = cashFlowService.getCashFlowById(cashFlowId, user);
         return response.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -106,9 +113,16 @@ public class CashFlowController {
     public ResponseEntity<Page<CashFlowResponse>> getCashFlows(
             @PageableDefault(size = 20) Pageable pageable,
             Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-        Page<CashFlowResponse> response = cashFlowService.getCashFlowsByUser(user, pageable);
-        return ResponseEntity.ok(response);
+        try {
+            String username = authentication.getName();
+            // Buscar o usuário pelo username no banco de dados
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            Page<CashFlowResponse> response = cashFlowService.getCashFlowsByUser(user, pageable);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/date-range")
@@ -141,12 +155,15 @@ public class CashFlowController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CashFlowResponse> updateCashFlow(
-            @PathVariable Long id,
+            @PathVariable String id,
             @Valid @RequestBody CashFlowRequest request,
             Authentication authentication) {
         try {
-            User user = (User) authentication.getPrincipal();
-            CashFlowResponse response = cashFlowService.updateCashFlow(id, request, user);
+            String username = authentication.getName();
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            Long cashFlowId = Long.parseLong(id);
+            CashFlowResponse response = cashFlowService.updateCashFlow(cashFlowId, request, user);
             cashFlowUpdatedCounter.increment();
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -156,11 +173,14 @@ public class CashFlowController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCashFlow(
-            @PathVariable Long id,
+            @PathVariable String id,
             Authentication authentication) {
         try {
-            User user = (User) authentication.getPrincipal();
-            cashFlowService.deleteCashFlow(id, user);
+            String username = authentication.getName();
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            Long cashFlowId = Long.parseLong(id);
+            cashFlowService.deleteCashFlow(cashFlowId, user);
             cashFlowDeletedCounter.increment();
             return ResponseEntity.noContent().build();
         } catch (Exception e) {

@@ -34,6 +34,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "whatsapp")
+    private String whatsapp;
+
     @Column(name = "first_name")
     private String firstName;
 
@@ -58,7 +61,8 @@ public class User {
     private LocalDateTime updatedAt;
 
     // Constructors
-    public User() {}
+    public User() {
+    }
 
     public User(String username, String email, String password) {
         this.username = username;
@@ -153,5 +157,13 @@ public class User {
 
     public void setRoles(String roles) {
         this.roles = roles;
+    }
+
+    public String getWhatsapp() {
+        return whatsapp;
+    }
+
+    public void setWhatsapp(String whatsapp) {
+        this.whatsapp = whatsapp;
     }
 }
