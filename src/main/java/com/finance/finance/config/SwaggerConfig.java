@@ -40,6 +40,7 @@ public class SwaggerConfig {
                                 .scheme("bearer")
                                 .bearerFormat("JWT")
                                 .description("Token JWT para autenticação")))
+                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
     }
 }
