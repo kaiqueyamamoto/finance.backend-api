@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class RegisterResponse {
 
-    private String id;
+    private Long id;
     private String username;
     private String email;
     private String whatsapp;
@@ -17,7 +17,7 @@ public class RegisterResponse {
     // Constructors
     public RegisterResponse() {}
 
-    public RegisterResponse(String id, String username, String email, String whatsapp, 
+    public RegisterResponse(Long id, String username, String email, String whatsapp, 
                           String firstName, String lastName, String roles, 
                           Boolean enabled, LocalDateTime createdAt) {
         this.id = id;
@@ -32,11 +32,11 @@ public class RegisterResponse {
     }
 
     // Getters and Setters
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

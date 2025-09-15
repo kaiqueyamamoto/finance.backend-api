@@ -92,7 +92,8 @@ public class CashFlowController {
             @PathVariable String id,
             Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        Optional<CashFlowResponse> response = cashFlowService.getCashFlowById(id, user);
+        Long cashFlowId = Long.parseLong(id);
+        Optional<CashFlowResponse> response = cashFlowService.getCashFlowById(cashFlowId, user);
         return response.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -146,7 +147,8 @@ public class CashFlowController {
             Authentication authentication) {
         try {
             User user = (User) authentication.getPrincipal();
-            CashFlowResponse response = cashFlowService.updateCashFlow(id, request, user);
+            Long cashFlowId = Long.parseLong(id);
+            CashFlowResponse response = cashFlowService.updateCashFlow(cashFlowId, request, user);
             cashFlowUpdatedCounter.increment();
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -160,7 +162,8 @@ public class CashFlowController {
             Authentication authentication) {
         try {
             User user = (User) authentication.getPrincipal();
-            cashFlowService.deleteCashFlow(id, user);
+            Long cashFlowId = Long.parseLong(id);
+            cashFlowService.deleteCashFlow(cashFlowId, user);
             cashFlowDeletedCounter.increment();
             return ResponseEntity.noContent().build();
         } catch (Exception e) {

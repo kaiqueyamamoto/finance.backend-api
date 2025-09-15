@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 public class CategoryResponse {
 
-    private String id;
+    private Long id;
     private String name;
     private String description;
     private Category.CategoryType type;
@@ -17,7 +17,7 @@ public class CategoryResponse {
     // Constructors
     public CategoryResponse() {}
 
-    public CategoryResponse(String id, String name, String description, 
+    public CategoryResponse(Long id, String name, String description, 
                            Category.CategoryType type, Boolean isActive,
                            LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
@@ -43,11 +43,11 @@ public class CategoryResponse {
     }
 
     // Getters and Setters
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
