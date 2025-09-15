@@ -62,12 +62,30 @@ POST /auth/login
 }
 ```
 
+**Resposta de sucesso:**
+```json
+{
+  "token": "eyJhbGciOiJIUzUxMiJ9...",
+  "type": "Bearer",
+  "username": "kaiqueyamamoto",
+  "email": "kaiqueyamamoto@example.com",
+  "roles": "USER,ADMIN",
+  "expiresAt": "2024-01-15T15:30:00"
+}
+```
+
 #### Exemplo de Token
 ```
 Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 ### 5. Endpoints Principais
+
+#### Authentication
+- `POST /auth/login` - Fazer login e obter token JWT
+- `POST /auth/logout` - Fazer logout
+- `GET /auth/me` - Informações do usuário atual
+- `GET /auth/validate` - Validar token JWT
 
 #### Test (Desenvolvimento)
 - `POST /auth/test/create-user` - Criar usuário de teste
