@@ -1,6 +1,5 @@
 package com.finance.finance.config;
 
-import com.finance.finance.service.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
