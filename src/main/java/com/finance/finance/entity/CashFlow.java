@@ -1,5 +1,6 @@
 package com.finance.finance.entity;
 
+import com.finance.finance.util.CuidGenerator;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -19,8 +20,8 @@ import java.time.LocalDateTime;
 public class CashFlow {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(length = 25)
+    private String id;
 
     @NotBlank
     @Size(min = 2, max = 200)
@@ -72,10 +73,13 @@ public class CashFlow {
     private LocalDateTime updatedAt;
 
     // Constructors
-    public CashFlow() {}
+    public CashFlow() {
+        this.id = CuidGenerator.generateCuid();
+    }
 
     public CashFlow(String description, BigDecimal amount, LocalDate transactionDate, 
                    CashFlowType type, Category category, User user) {
+        this.id = CuidGenerator.generateCuid();
         this.description = description;
         this.amount = amount;
         this.transactionDate = transactionDate;
@@ -85,11 +89,11 @@ public class CashFlow {
     }
 
     // Getters and Setters
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

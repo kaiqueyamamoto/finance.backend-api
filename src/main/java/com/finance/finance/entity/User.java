@@ -1,5 +1,6 @@
 package com.finance.finance.entity;
 
+import com.finance.finance.util.CuidGenerator;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -16,8 +17,8 @@ import java.time.LocalDateTime;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(length = 25)
+    private String id;
 
     @NotBlank
     @Size(min = 3, max = 50)
@@ -33,6 +34,9 @@ public class User {
     @Size(min = 6)
     @Column(nullable = false)
     private String password;
+
+    @Column(name = "whatsapp")
+    private String whatsapp;
 
     @Column(name = "first_name")
     private String firstName;
@@ -58,20 +62,23 @@ public class User {
     private LocalDateTime updatedAt;
 
     // Constructors
-    public User() {}
+    public User() {
+        this.id = CuidGenerator.generateCuid();
+    }
 
     public User(String username, String email, String password) {
+        this.id = CuidGenerator.generateCuid();
         this.username = username;
         this.email = email;
         this.password = password;
     }
 
     // Getters and Setters
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -153,5 +160,13 @@ public class User {
 
     public void setRoles(String roles) {
         this.roles = roles;
+    }
+
+    public String getWhatsapp() {
+        return whatsapp;
+    }
+
+    public void setWhatsapp(String whatsapp) {
+        this.whatsapp = whatsapp;
     }
 }

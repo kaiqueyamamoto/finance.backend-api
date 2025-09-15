@@ -3,6 +3,8 @@ package com.finance.finance.controller;
 import com.finance.finance.config.JwtConfig;
 import com.finance.finance.dto.LoginRequest;
 import com.finance.finance.dto.LoginResponse;
+import com.finance.finance.dto.RegisterRequest;
+import com.finance.finance.dto.RegisterResponse;
 import com.finance.finance.entity.User;
 import com.finance.finance.repository.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,16 +38,22 @@ public class AuthController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private JwtConfig jwtConfig;
 
     @PostMapping("/login")
-    @Operation(summary = "Fazer login", description = "Autentica o usuário e retorna um token JWT")
+    @Operation(
+        summary = "🔐 Fazer login no sistema", 
+        description = "Autentica o usuário com username e password, retornando um token JWT válido por 1 hora. " +
+                     "O token deve ser usado no header 'Authorization: Bearer {token}' para acessar endpoints protegidos."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Login realizado com sucesso"),
-            @ApiResponse(responseCode = "401", description = "Credenciais inválidas"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos")
+            @ApiResponse(responseCode = "200", description = "✅ Login realizado com sucesso - Token JWT retornado"),
+            @ApiResponse(responseCode = "401", description = "❌ Credenciais inválidas - Username ou password incorretos"),
+            @ApiResponse(responseCode = "400", description = "⚠️ Dados inválidos - Verifique o formato dos campos obrigatórios")
     })
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
         try {
@@ -98,10 +106,82 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/logout")
-    @Operation(summary = "Fazer logout", description = "Invalida a sessão do usuário")
+    @PostMapping("/register")
+    @Operation(
+        summary = "📝 Registrar novo usuário", 
+        description = "Cria uma nova conta de usuário no sistema. " +
+                     "Todos os campos são obrigatórios exceto firstName e lastName. " +
+                     "O WhatsApp deve seguir o formato internacional (ex: +5511999999999). " +
+                     "Novos usuários recebem automaticamente a role 'USER'."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Logout realizado com sucesso")
+            @ApiResponse(responseCode = "201", description = "✅ Usuário criado com sucesso - Conta ativada e pronta para uso"),
+            @ApiResponse(responseCode = "400", description = "⚠️ Dados inválidos ou usuário já existe - Verifique username, email ou formato dos dados"),
+            @ApiResponse(responseCode = "500", description = "❌ Erro interno do servidor - Tente novamente mais tarde")
+    })
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
+        try {
+            // Verificar se o username já existe
+            if (userRepository.existsByUsername(registerRequest.getUsername())) {
+                Map<String, String> error = new HashMap<>();
+                error.put("error", "Username já existe");
+                error.put("message", "Este username já está sendo usado por outro usuário");
+                return ResponseEntity.status(400).body(error);
+            }
+
+            // Verificar se o email já existe
+            if (userRepository.existsByEmail(registerRequest.getEmail())) {
+                Map<String, String> error = new HashMap<>();
+                error.put("error", "Email já existe");
+                error.put("message", "Este email já está sendo usado por outro usuário");
+                return ResponseEntity.status(400).body(error);
+            }
+
+            // Criar novo usuário
+            User newUser = new User();
+            newUser.setUsername(registerRequest.getUsername());
+            newUser.setEmail(registerRequest.getEmail());
+            newUser.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
+            newUser.setWhatsapp(registerRequest.getWhatsapp());
+            newUser.setFirstName(registerRequest.getFirstName());
+            newUser.setLastName(registerRequest.getLastName());
+            newUser.setEnabled(true);
+            newUser.setRoles("USER"); // Usuários novos começam como USER
+
+            // Salvar no banco de dados
+            User savedUser = userRepository.save(newUser);
+
+            // Criar resposta
+            RegisterResponse registerResponse = new RegisterResponse(
+                    savedUser.getId(),
+                    savedUser.getUsername(),
+                    savedUser.getEmail(),
+                    savedUser.getWhatsapp(),
+                    savedUser.getFirstName(),
+                    savedUser.getLastName(),
+                    savedUser.getRoles(),
+                    savedUser.getEnabled(),
+                    savedUser.getCreatedAt()
+            );
+
+            return ResponseEntity.status(201).body(registerResponse);
+
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Erro interno do servidor");
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(500).body(error);
+        }
+    }
+
+    @PostMapping("/logout")
+    @Operation(
+        summary = "🚪 Fazer logout", 
+        description = "Invalida a sessão atual do usuário e limpa o contexto de segurança. " +
+                     "Após o logout, o token JWT ainda será válido até expirar, mas a sessão é encerrada."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "✅ Logout realizado com sucesso - Sessão encerrada")
     })
     public ResponseEntity<Map<String, String>> logout() {
         SecurityContextHolder.clearContext();
@@ -111,10 +191,15 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    @Operation(summary = "Informações do usuário atual", description = "Retorna as informações do usuário autenticado")
+    @Operation(
+        summary = "👤 Informações do usuário atual", 
+        description = "Retorna as informações completas do usuário autenticado, incluindo dados pessoais, " +
+                     "roles e status da conta. Requer token JWT válido no header Authorization."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Informações obtidas com sucesso"),
-            @ApiResponse(responseCode = "401", description = "Não autorizado")
+            @ApiResponse(responseCode = "200", description = "✅ Informações obtidas com sucesso - Dados do usuário retornados"),
+            @ApiResponse(responseCode = "401", description = "❌ Não autorizado - Token JWT inválido ou expirado"),
+            @ApiResponse(responseCode = "404", description = "⚠️ Usuário não encontrado - Conta pode ter sido removida")
     })
     public ResponseEntity<?> getCurrentUser(Authentication authentication) {
         try {
