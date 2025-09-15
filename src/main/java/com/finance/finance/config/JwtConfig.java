@@ -84,9 +84,17 @@ public class JwtConfig {
     }
 
     private SecretKey getSigningKey() {
-        // Use Keys.secretKeyFor to generate a secure key for HS512
-        // This ensures the key is exactly 512 bits (64 bytes) as required by HS512
-        return Keys.secretKeyFor(SignatureAlgorithm.HS512);
+        // Use the configured secret from application.properties
+        // Convert the string secret to a proper SecretKey for HS512
+        byte[] keyBytes = secret.getBytes();
+        // Ensure the key is exactly 512 bits (64 bytes) as required by HS512
+        if (keyBytes.length != 64) {
+            // If the secret is not exactly 64 bytes, pad or truncate it
+            byte[] adjustedKey = new byte[64];
+            System.arraycopy(keyBytes, 0, adjustedKey, 0, Math.min(keyBytes.length, 64));
+            return Keys.hmacShaKeyFor(adjustedKey);
+        }
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public Long getExpiration() {

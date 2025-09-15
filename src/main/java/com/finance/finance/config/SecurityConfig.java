@@ -47,7 +47,9 @@ public class SecurityConfig {
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/auth/test/**").permitAll()
                 .requestMatchers("/auth/categories/initialize").permitAll()
-                // Endpoints protegidos
+
+                // Endpoints protegidos - require authentication
+                .requestMatchers("/auth/me", "/auth/validate", "/auth/logout").authenticated()
                 .requestMatchers("/auth/**").authenticated()
                 .anyRequest().authenticated()
             )
