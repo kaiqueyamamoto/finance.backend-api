@@ -37,22 +37,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             jwtToken = requestTokenHeader.substring(7);
             try {
                 username = jwtConfig.getUsernameFromToken(jwtToken);
+                logger.debug("JWT Token parsed successfully for user: " + username);
             } catch (Exception e) {
-                logger.error("Unable to get JWT Token or JWT Token has expired");
+                logger.error("Unable to get JWT Token or JWT Token has expired: " + e.getMessage());
             }
         } else {
-            logger.warn("JWT Token does not begin with Bearer String");
+            logger.warn("JWT Token does not begin with Bearer String. Header: " + requestTokenHeader);
         }
 
         // Uma vez obtido o token, valida o token
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
+            logger.debug("Attempting to load user details for: " + username);
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
             // se o token é válido, configure Spring Security para configurar manualmente
             // autenticação
-            if (jwtConfig.validateToken(jwtToken, userDetails)) {
-
+            boolean isValidToken = jwtConfig.validateToken(jwtToken, userDetails);
+            logger.debug("Token validation result: " + isValidToken);
+            
+            if (isValidToken) {
+                logger.debug("Setting authentication context for user: " + username);
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 usernamePasswordAuthenticationToken
@@ -61,7 +65,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // que o usuário atual está autenticado. Então ele passa o
                 // Spring Security Configurations com sucesso.
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+            } else {
+                logger.warn("Token validation failed for user: " + username);
             }
+        } else {
+            logger.debug("Skipping token validation - username: " + username + ", existing auth: " + (SecurityContextHolder.getContext().getAuthentication() != null));
         }
         filterChain.doFilter(request, response);
     }
