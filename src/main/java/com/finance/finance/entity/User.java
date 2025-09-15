@@ -1,6 +1,5 @@
 package com.finance.finance.entity;
 
-import com.finance.finance.util.CuidGenerator;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -17,8 +16,8 @@ import java.time.LocalDateTime;
 public class User {
 
     @Id
-    @Column(length = 25)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @NotBlank
     @Size(min = 3, max = 50)
@@ -63,22 +62,20 @@ public class User {
 
     // Constructors
     public User() {
-        this.id = CuidGenerator.generateCuid();
     }
 
     public User(String username, String email, String password) {
-        this.id = CuidGenerator.generateCuid();
         this.username = username;
         this.email = email;
         this.password = password;
     }
 
     // Getters and Setters
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

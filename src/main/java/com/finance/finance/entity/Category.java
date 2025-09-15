@@ -1,6 +1,5 @@
 package com.finance.finance.entity;
 
-import com.finance.finance.util.CuidGenerator;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -18,8 +17,8 @@ import java.util.List;
 public class Category {
 
     @Id
-    @Column(length = 25)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @NotBlank
     @Size(min = 2, max = 100)
@@ -50,22 +49,20 @@ public class Category {
 
     // Constructors
     public Category() {
-        this.id = CuidGenerator.generateCuid();
     }
 
     public Category(String name, String description, CategoryType type) {
-        this.id = CuidGenerator.generateCuid();
         this.name = name;
         this.description = description;
         this.type = type;
     }
 
     // Getters and Setters
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
