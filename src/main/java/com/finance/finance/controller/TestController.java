@@ -48,7 +48,6 @@ public class TestController {
         try {
             // Create a mock user for testing
             User testUser = new User();
-            testUser.setId(1L);
             testUser.setUsername("testuser");
             testUser.setEmail("test@example.com");
             testUser.setPassword("password");
@@ -70,7 +69,6 @@ public class TestController {
         try {
             // Create a mock user for testing
             User testUser = new User();
-            testUser.setId(1L);
             testUser.setUsername("testuser");
             testUser.setEmail("test@example.com");
             testUser.setPassword("password");

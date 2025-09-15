@@ -89,7 +89,7 @@ public class CashFlowController {
     })
     public ResponseEntity<CashFlowResponse> getCashFlow(
             @Parameter(description = "ID do fluxo de caixa")
-            @PathVariable Long id,
+            @PathVariable String id,
             Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         Optional<CashFlowResponse> response = cashFlowService.getCashFlowById(id, user);
@@ -141,7 +141,7 @@ public class CashFlowController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CashFlowResponse> updateCashFlow(
-            @PathVariable Long id,
+            @PathVariable String id,
             @Valid @RequestBody CashFlowRequest request,
             Authentication authentication) {
         try {
@@ -156,7 +156,7 @@ public class CashFlowController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCashFlow(
-            @PathVariable Long id,
+            @PathVariable String id,
             Authentication authentication) {
         try {
             User user = (User) authentication.getPrincipal();

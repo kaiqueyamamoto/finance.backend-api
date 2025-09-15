@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 public class CashFlowResponse {
 
-    private Long id;
+    private String id;
     private String description;
     private BigDecimal amount;
     private LocalDate transactionDate;
@@ -25,7 +25,7 @@ public class CashFlowResponse {
     // Constructors
     public CashFlowResponse() {}
 
-    public CashFlowResponse(Long id, String description, BigDecimal amount, 
+    public CashFlowResponse(String id, String description, BigDecimal amount, 
                            LocalDate transactionDate, CashFlow.CashFlowType type,
                            CategoryResponse category, String notes, Boolean isRecurring,
                            String recurringFrequency, Boolean isActive, 
@@ -68,11 +68,11 @@ public class CashFlowResponse {
     }
 
     // Getters and Setters
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
